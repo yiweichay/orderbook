@@ -4,6 +4,7 @@ Aim of this project is to build an orderbook for me to further understand the fi
 
 ## Tech stack
 Backend: Python
+
 Visualisation: React (potentially, or just matplotlib)
 
 ## Description
