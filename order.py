@@ -5,7 +5,7 @@ class Order:
             self,
             id_number: int,
             is_buy: bool,
-            shares: int,
+            shares: int, #units
             limit: int, #price of the order
             timestamp: int
     ) -> None:
@@ -16,4 +16,3 @@ class Order:
         self.timestamp: int = timestamp
         self.next_order: 'Order' = None
         self.prev_order: 'Order' = None
-        self.parent_limit: Limit = None

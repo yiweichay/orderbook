@@ -13,18 +13,28 @@ class Book:
         self.order_map: dict = {}
 
     def add_limit_order_to_tree(self, order: Order):
-        if order.is_buy:
-            self.buy_tree = insert_limit(self.buy_tree, Limit(order))
+        limit = self.limit_map.get(order.limit)
+        # if limit is not present and node not in tree
+        if not limit:
+            limit = Limit(order)
+            self.limit_map[order.limit] = limit
+            if order.is_buy:
+                self.buy_tree = insert_limit(self.buy_tree, limit)
+            else:
+                self.sell_tree = insert_limit(self.sell_tree, Limit(order))
+        # if limit is present and node in tree 
         else:
-            self.sell_tree = insert_limit(self.sell_tree, Limit(order))
+            order.prev_order = limit.tail_order
+            limit.tail_order.next_order = order
+            limit.tail_order = order
                 
 def insert_limit(current_node: Limit | None, new_node: Limit):
     if current_node is None:
         return new_node
     if current_node.limit_price < new_node.limit_price:
-        insert_limit(current_node.right_child, new_node)
+        current_node.right_child = insert_limit(current_node.right_child, new_node)
     else:
-        insert_limit(current_node.left_child, new_node)
+        current_node.left_child = insert_limit(current_node.left_child, new_node)
     return current_node
 
 '''
