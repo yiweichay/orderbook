@@ -18,4 +18,4 @@ There will be 2 binary trees: buy tree and sell tree. An order is added into the
 
 For each node in the binary tree, if there is more than 1 limit order, the limit order will be appended to the doubly linked list.
 
-![architecture](attachments\6260407385520717107.jpg)
+![image](https://github.com/user-attachments/assets/9e3f2da3-d7a9-4901-9aff-8a6d6497ee35)
