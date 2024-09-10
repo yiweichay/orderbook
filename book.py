@@ -1,7 +1,11 @@
 from limit import Limit
 from order import Order
 
-# A book has all the different limits stored as a binary search tree
+'''
+A book has all the different limits stored as a binary search tree
+Book -> Limit -> Order
+'''
+
 class Book:
     def __init__(self) -> None:
         self.buy_tree: Limit = None
@@ -14,6 +18,7 @@ class Book:
 
     def add_limit_order_to_tree(self, order: Order):
         limit = self.limit_map.get(order.limit)
+        self.order_map[order.id_number] = order
         # if limit is not present and node not in tree
         if not limit:
             limit = Limit(order)
@@ -31,9 +36,45 @@ class Book:
             order.prev_order = limit.tail_order
             limit.tail_order.next_order = order
             limit.tail_order = order
+            limit.total_volume += order.shares
     
     def delete_limit_order_from_tree(self, order: Order):
-        pass
+        # buy order, remove from sell tree
+        # sell order, remove from buy tree
+        shares_to_delete = order.shares
+        if order.is_buy:
+            # this is for limit orders, because it will delete until the limit
+            # for market orders, we can set limit = 0, so there is no limit price
+            while shares_to_delete and self.lowest_sell and order.limit >= self.lowest_sell.limit_price:
+                # if the shares to delete is more than the total volume available in a limit, delete the whole limit
+                if shares_to_delete >= self.lowest_sell.total_volume:
+                    del self.limit_map[self.lowest_sell]
+                    current_order = self.lowest_sell.head_order
+                    # delete all the order ids from the order map (the whole linked list of each limit)
+                    while current_order:
+                        del self.order_map[current_order.id]
+                        current_order = current_order.next_order
+                    shares_to_delete -= self.lowest_sell.total_volume
+                    self.lowest_sell = delete_limit_sell_tree(self.lowest_sell)
+
+                # if shares to delete is lesser than volume available in the limit
+                else:
+                    current_order = self.lowest_sell.head_order
+                    while shares_to_delete:
+                        # check the head order to see if the units are more or less than shares to delete
+                        if shares_to_delete < current_order.shares:
+                            current_order.shares -= shares_to_delete
+                            self.lowest_sell.total_volume -= shares_to_delete
+                            shares_to_delete = 0
+                        else:
+                            del self.order_map[current_order.id]
+                            current_order.next_order.prev_order = None
+                            self.lowest_sell.total_volume -= current_order.shares
+                            shares_to_delete -= current_order.shares
+                            current_order = current_order.next_order
+                            self.lowest_sell.head_order = current_order
+                        
+
                 
 def insert_limit(current_node: Limit | None, new_node: Limit):
     if current_node is None:

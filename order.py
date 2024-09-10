@@ -1,3 +1,7 @@
+'''
+Order is a single order submitted by the buyer/seller
+'''
+
 class Order:
     def __init__(
             self,
