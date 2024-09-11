@@ -73,6 +73,32 @@ class Book:
                             shares_to_delete -= current_order.shares
                             current_order = current_order.next_order
                             self.lowest_sell.head_order = current_order
+       
+        # if order.is_buy == false, delete from the buy tree
+        else:
+            while shares_to_delete and self.highest_buy and order.limit <= self.highest_buy.limit_price:
+                if shares_to_delete >= self.highest_buy.total_volume:
+                    del self.limit_map[self.highest_buy]
+                    current_order = self.highest_buy.head_order
+                    while current_order:
+                        del self.order_map[current_order.id]
+                        current_order = current_order.next_order
+                    shares_to_delete -= self.highest_buy.total_volume
+                    self.highest_buy = delete_limit_buy_tree(self.highest_buy)
+                else:
+                    current_order = self.highest_buy.head_order
+                    while shares_to_delete:
+                        if shares_to_delete < current_order.shares:
+                            current_order.shares -= shares_to_delete
+                            self.highest_buy.total_volume -= shares_to_delete
+                            shares_to_delete = 0
+                        else:
+                            del self.order_map[current_order.id]
+                            current_order.next_order.prev_order = None
+                            self.highest_buy.total_volume -= current_order.shares
+                            current_order = current_order.next_order
+                            self.highest_buy.head_order = current_order
+        return shares_to_delete
                         
 
                 
