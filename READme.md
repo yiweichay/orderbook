@@ -3,9 +3,9 @@
 Aim of this project is to build an orderbook for me to further understand the financial markets.
 
 ## Tech stack
-Backend: Python
+Backend: Python [Flask]
 
-Visualisation: React (potentially, or just matplotlib)
+Visualisation: TypeScript [React]
 
 ## Description
 
